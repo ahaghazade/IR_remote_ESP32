@@ -1,46 +1,132 @@
 #include <Arduino.h>
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
+#include <ESPAsyncWebServer.h>
+#include <HTTPClient.h>
+#include "ArduinoJson.h"
+#include <WiFiMulti.h>
+#include <ESPmDNS.h>
 
-struct Mode
-{
-  #define Auto 0
-  #define Cool 1
-  #define Dry 2
-  #define Fan 2
-  #define Heat 4
-  
-};
+#define DNSNAME "ircontrol"
+AsyncWebServer serverIR(80);
+WiFiClient client;
+WiFiMulti wifiMulti;
+
+#define BlueLedPin 2  
+
+//manufactors
+#define Goodweather 0
+#define Sony 5
+#define Samsung 2
+#define LG 3
 
 
-unsigned long originalValue = 0x550000000000;
 
 const uint16_t kIrLed = 5;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
 IRsend irsend(kIrLed);  // Set the GPIO to be used to sending the message.
 
-// Example of data captured by IRrecvDumpV2.ino
-uint16_t rawData[197] = {6190, 7272,  652, 1522,  648, 1520,  652, 1518,  650, 1524,  646, 1524,  646, 1520,  652, 1520,  650, 1520,  650, 420,  652, 420,  652, 420,  650, 420,  652, 418,  652, 422,  650, 422,  648, 420,  652, 1520,  650, 1520,  648, 1522,  648, 1520,  650, 1522,  624, 1544,  626, 1544,  626, 1544,  626, 444,  626, 446,  648, 422,  646, 426,  626, 442,  626, 444,  628, 444,  628, 444,  628, 1544,  626, 1542,  628, 444,  626, 1544,  624, 1546,  624, 1542,  626, 1546,  624, 446,  626, 446,  624, 448,  622, 1546,  624, 448,  624, 448,  622, 452,  620, 448,  620, 1552,  594, 1576,  592, 478,  590, 480,  590, 1578,  588, 484,  586, 1584,  584, 1584,  584, 1588,  582, 488,  582, 1588,  582, 1586,  582, 490,  582, 1588,  582, 490,  582, 488,  586, 488,  586, 1584,  586, 1582,  612, 460,  612, 458,  614, 1560,  610, 1558,  612, 1558,  608, 462,  610, 462,  610, 460,  610, 1560,  610, 1560,  608, 462,  608, 464,  608, 464,  606, 1562,  608, 466,  604, 1566,  582, 488,  582, 1590,  580, 496,  576, 1590,  580, 492,  580, 1592,  578, 1590,  578, 494,  576, 1596,  574, 496,  574, 1614,  556, 516,  554, 1614,  556, 514,  554, 7368,  554}; 
-
-
-void CalCommand(int Mode, int Temp, int Air, int FanSpeed, int Swing, int Command)
+void SendToIR(String Command, int Type)
 {
-  
+  switch (Type)
+  {
+  case Goodweather:
+   const uint64_t result = strtoull(Command.substring(2).c_str(), NULL, 16);
+    Serial.println(result);
+    uint64_t a = 0x558C1A840000;
+    Serial.println(a);
+    irsend.sendGoodweather(result);
+    break;
+
+  case Sony:
+    // irsend.sendSony(Command.c_str());
+    Serial.println("Type: Sony");
+    break;
+
+  default:
+    Serial.println("Not Valid Type");
+    break;
+  }
+
+  // Serial.println("sendGoodweather");
+  // irsend.sendGoodweather(0x558C1A840000);
 }
 
 void setup() {
+  Serial.begin(115200);
+  pinMode(BlueLedPin,OUTPUT);
+
   irsend.begin();
-#if ESP8266
-  Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
-#else  // ESP8266
-  Serial.begin(115200, SERIAL_8N1);
-#endif  // ESP8266
+  WiFi.mode(WIFI_STA);
+  wifiMulti.addAP("IGH-Wifi", "Konect210");
+  // wifiMulti.addAP("MobinNet20", "K6YJScyY");
+  wifiMulti.addAP("Irancell-TF-i60-B6A7_1", "@tm@1425#@tm@");
+  Serial.println("Connecting Wifi...");
+  if(wifiMulti.run() == WL_CONNECTED) {
+    Serial.println("");
+    Serial.println("WiFi connected");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
+  }
+  delay(1000);
+
+  serverIR.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "text/plain", "Hi! I am ESP32. My IP: " + WiFi.localIP().toString());
+    digitalWrite(BlueLedPin , !digitalRead(BlueLedPin));
+  });
+
+  serverIR.onRequestBody(
+        [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
+        {
+            if ((request->url() == "/command") &&
+                (request->method() == HTTP_POST))
+            {
+                const size_t        JSON_DOC_SIZE   = 512U;
+                DynamicJsonDocument jsonDoc(JSON_DOC_SIZE);
+                
+                if (DeserializationError::Ok == deserializeJson(jsonDoc, (const char*)data))
+                {
+                  String Command = "";
+                  int Type = -1;
+                  Serial.println("===============");
+                    JsonObject obj = jsonDoc.as<JsonObject>();
+                    if (obj.containsKey("command"))
+                    {
+                      Command = obj["command"].as<String>();
+                      Serial.print("Command: ");
+                      Serial.println(Command);
+                    }
+                    else
+                      Serial.println("Command key not exist...");
+
+                     if (obj.containsKey("type"))
+                    {
+                      Type = obj["type"].as<int>();
+                      Serial.print("Type: ");
+                      Serial.println(Type);
+                    }
+                    else
+                      Serial.println("Type key not exist...");
+
+                    if(Type != -1 && Command != "")
+                      SendToIR(Command, Type);
+                }
+
+                request->send(200, "application/json", "{ \"status\": 0 }");
+            }
+        }
+    );
+
+  serverIR.begin();
+  Serial.println("HTTP server started");
+
+  while(!MDNS.begin(DNSNAME))
+  {
+     Serial.println("Starting mDNS...");
+     delay(1000);
+  }
+  Serial.println("MDNS started");
 }
 
 void loop() {
-  Serial.println("sendGoodweather");
-  irsend.sendGoodweather(0x558C1A840000);
-  delay(2000);
-  Serial.println("a rawData capture from IRrecvDumpV2");
-  irsend.sendRaw(rawData, 197, 38);  // Send a raw data capture at 38kHz.
-  delay(2000);
+  delay(1000);
 }
