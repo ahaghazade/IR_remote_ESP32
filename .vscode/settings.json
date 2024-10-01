@@ -1,17 +1,5 @@
 {
-    "idf.port": "/dev/ttyUSB0",
     "files.associations": {
-        "*.tcc": "cpp",
-        "memory": "cpp",
-        "streambuf": "cpp",
-        "regex": "cpp",
-        "array": "cpp",
-        "deque": "cpp",
-        "string": "cpp",
-        "unordered_map": "cpp",
-        "unordered_set": "cpp",
-        "vector": "cpp",
-        "string_view": "cpp",
-        "initializer_list": "cpp"
+        "system_error": "cpp"
     }
 }

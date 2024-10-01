@@ -1,0 +1,232 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #74b9ff, #a29bfe); /* Gradient background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    text-align: center;
+}
+
+.control-panel {
+    background-color: #ffffff;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    text-align: center;
+    border: 2px solid #d9d9d9;
+}
+
+.log-container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.log-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.input-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.input-field {
+    flex: 1;
+    padding: 10px;
+    font-size: 1em;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-right: 10px;
+    margin-left: 5px;
+    transition: border-color 0.3s ease;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.btn {
+    background-color: #2b8eff;
+    color: white;
+    padding: 10px 30px;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    margin-right: 5px;
+}
+
+.btn:hover {
+    background-color: #007bff;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+/* Box for displaying commands */
+.commands-box {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+}
+
+.commands-box h2 {
+    font-size: 1.2em;
+    color: #03676e;
+    margin-bottom: 15px;
+}
+
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.icon-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.icon-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-3px);
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Control Item Styles */
+.control-item {
+    margin: 15px 0;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Button Styles */
+button {
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 10px 15px;
+    transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+button i {
+    margin-right: 8px;
+}
+
+.toggle-btn {
+    background-color: #ddd;
+    color: #333;
+}
+
+.toggle-btn.on {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.toggle-btn.off {
+    background-color: #333;
+    color: white;
+}
+
+/* Fan Speed Styles */
+.speed-btn {
+    background-color: #ddd;
+    color: #333;
+    margin: 2px;
+    padding: 10px 10px;
+}
+
+.speed-btn.selected {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Temperature Controls */
+.temperature-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.temperature-controls {
+    display: flex;
+    align-items: center;
+}
+
+#temperature-input {
+    width: 50px;
+    text-align: center;
+    border: none;
+    background-color: #f4f4f4;
+    font-size: 18px;
+    margin: 0 10px;
+    font-weight: bold;
+}
+
+.temp-btn {
+    background-color: #ddd;
+    padding: 10px;
+    font-size: 20px;
+    border-radius: 5px;
+}
+
+.temp-btn:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Fan Speed Box */
+.fan-speed-box {
+    display: flex;
+    justify-content: space-between;
+}
+.countdown-timer {
+    font-size: 1.2em;
+    color: #ff4757;
+    margin-top: 15px;
+    font-weight: bold;
+}
